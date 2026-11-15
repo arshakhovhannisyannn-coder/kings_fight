@@ -1,0 +1,35 @@
+{
+  "a": {
+    "level": "medium"
+  },
+  "b": {
+    "level": "easy"
+  },
+  "seed": 2,
+  "games": 20,
+  "winsA": 20,
+  "winsB": 0,
+  "draws": 0,
+  "rounds": 294,
+  "firstMoverWins": 10,
+  "secondMoverWins": 10,
+  "byReason": {
+    "king": 14,
+    "towers": 6,
+    "hp": 0,
+    "draw": 0
+  },
+  "thinkA": 3098.49254994228,
+  "thinkB": 4.3228017027395405,
+  "winsAasFirst": 10,
+  "gamesAasFirst": 10,
+  "towersA": 39,
+  "towersB": 0,
+  "avgRounds": 14.7,
+  "winRateA": 1,
+  "winRateB": 0,
+  "firstMoverWinRate": 0.5,
+  "avgThinkMsA": 154.92462749711402,
+  "avgThinkMsB": 0.21614008513697702,
+  "seconds": 49.848
+}
