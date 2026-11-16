@@ -41,7 +41,7 @@ export function deckScreen(app, params = {}) {
             }, 'Պահպանել'))),
         h('section.panel', {},
           h('h3', {}, 'Հասանելի քարտեր'),
-          h('p.hint', {}, `Սահմանափակումներ. զինվոր՝ մինչև ${limits.maxCopies.soldier} օրինակ, հմայք և կառույց՝ մինչև ${limits.maxCopies.spell}, հերոս՝ 1, ընդամենը ${limits.maxLegendary} լեգենդար քարտ։`),
+          h('p.hint', {}, `Սահմանափակումներ. կապուկի բոլոր ${CONFIG.deckSize} քարտերը պետք է տարբեր լինեն (նույնը վերաբերում է հակառակորդին), ընդամենը ${limits.maxLegendary} լեգենդար քարտ։`),
           ['soldier', 'hero', 'special', 'spell', 'building'].map(type => {
             const ids = pool.filter(id => CARDS[id].type === type);
             if (!ids.length) return null;

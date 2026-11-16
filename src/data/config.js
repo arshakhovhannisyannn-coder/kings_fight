@@ -28,7 +28,9 @@ export const CONFIG = {
   newUnitCanAttack: true,
   turnTimerSeconds: 8,            // planning phase length; options in settings: 5, 8, 12, off (0)
   deckSize: 8, handSize: 4,
-  deckLimits: { maxLegendary: 2, maxCopies: { soldier: 3, spell: 2, building: 2, hero: 1, special: 1 } },
+  // v1.4.1: one copy of every card (8 different cards) for both sides. Before, enemy decks held 2–3 copies of
+  // cheap units (e.g. archers) and could cycle them much faster than the player's all-different starter deck.
+  deckLimits: { maxLegendary: 2, maxCopies: { soldier: 1, spell: 1, building: 1, hero: 1, special: 1 } },
   // NOTE: the original design used range 2 for both towers. Self-play showed that range 2 makes the game an
   // almost certain draw (see docs/DECISIONS.md and docs/experiments/6_rule_variants.md), so the default is 1.
   // v1.2 balance pass: tower attack lowered from 2 / 3 to 1 / 2 (shorter games, the King's castle falls more often;

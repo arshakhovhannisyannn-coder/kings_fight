@@ -239,7 +239,9 @@ test('deck validation', () => {
   assert.equal(validateDeck(['vahagn', 'vahagn', 'vahagn', 'spearman', 'archer', 'slinger', 'cavalry', 'ararat'], CONFIG).ok, false);
   assert.equal(validateDeck(['hayk', 'hayk', 'spearman', 'spearman', 'archer', 'slinger', 'cavalry', 'ararat'], CONFIG).ok, false);
   assert.equal(validateDeck(['hayk', 'tigran', 'vardan', 'spearman', 'archer', 'slinger', 'cavalry', 'ararat'], CONFIG).ok, false);
-  assert.ok(validateDeck(['hayk', 'sardarapat', 'spearman', 'spearman', 'spearman', 'archer', 'wall', 'wall'], CONFIG).ok);
+  assert.ok(validateDeck(['hayk', 'sardarapat', 'spearman', 'slinger', 'cavalry', 'archer', 'wall', 'vahagn'], CONFIG).ok);
+  assert.equal(validateDeck(['spearman', 'spearman', 'archer', 'slinger', 'cavalry', 'shieldbearer', 'vahagn', 'ararat'], CONFIG).ok, false);  // v1.4.1: no copies
+  assert.equal(validateDeck(['wall', 'wall', 'archer', 'slinger', 'cavalry', 'shieldbearer', 'vahagn', 'ararat'], CONFIG).ok, false);
   assert.equal(validateDeck(STARTER_DECK.slice(0, 7).concat('hayk'), CONFIG, STARTER_DECK).ok, false);  // not unlocked
 });
 

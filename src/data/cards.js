@@ -150,7 +150,7 @@ export function validateDeck(deck, cfg, allowed = null) {
   for (const id of Object.keys(counts)) {
     const def = CARDS[id];
     const max = cfg.deckLimits.maxCopies[def.type];
-    if (counts[id] > max) errors.push(`«${def.nameHy}»՝ առավելագույնը ${max} օրինակ։`);
+    if (counts[id] > max) errors.push(max === 1 ? `«${def.nameHy}» քարտը կրկնվում է. բոլոր քարտերը պետք է տարբեր լինեն։` : `«${def.nameHy}»՝ առավելագույնը ${max} օրինակ։`);
   }
   if (legendary > cfg.deckLimits.maxLegendary) errors.push(`Առավելագույնը ${cfg.deckLimits.maxLegendary} լեգենդար քարտ (հերոս/հատուկ)։`);
   return { ok: errors.length === 0, errors };

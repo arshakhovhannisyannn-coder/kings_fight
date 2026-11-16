@@ -95,7 +95,7 @@ npm run icon
 npm run dist
 ```
 
-`npm run icon`-ը նկարում է խաղի զինանշանը և ստեղծում `build/icon.ico`, `build/icon.png`, `assets/icon.png` ֆայլերը։ `npm run dist`-ը `dist/` պանակում ստեղծում է `ArqaneriMart-1.4.0-portable.exe` (առանց տեղադրման) և `ArqaneriMart-1.4.0-setup.exe` (տեղադրիչ՝ աշխատասեղանի պատկերակով)։ Առաջին անգամ պահանջվում է ինտերնետ (electron-builder-ը ներբեռնում է իր գործիքները)։
+`npm run icon`-ը նկարում է խաղի զինանշանը և ստեղծում `build/icon.ico`, `build/icon.png`, `assets/icon.png` ֆայլերը։ `npm run dist`-ը `dist/` պանակում ստեղծում է `ArqaneriMart-1.4.1-portable.exe` (առանց տեղադրման) և `ArqaneriMart-1.4.1-setup.exe` (տեղադրիչ՝ աշխատասեղանի պատկերակով)։ Առաջին անգամ պահանջվում է ինտերնետ (electron-builder-ը ներբեռնում է իր գործիքները)։
 
 ## Նախագծի կառուցվածքը
 
