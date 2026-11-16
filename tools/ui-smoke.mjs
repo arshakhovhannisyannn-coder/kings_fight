@@ -61,7 +61,7 @@ app.whenReady().then(async () => {
   await sleep(300);
   check(await screen() === 'menu', 'the intro was not skipped by a key');
   check(await js('import("./audio.js").then(m => m.audio.ready)') === true, 'audio did not start after the first key press');
-  check(/v1\.2/.test(await js('document.querySelector(".version").textContent')), 'version label missing in the menu');
+  check(/v\d+\.\d+/.test(await js('document.querySelector(".version").textContent')), 'version label missing in the menu');
   await sleep(700);
   await shot('01_menu');
 
@@ -140,8 +140,8 @@ app.whenReady().then(async () => {
   const glowIdx = await js(`[...document.querySelectorAll('.hand .card')].findIndex(c => c.classList.contains('glow') && !['vahagn','ararat'].includes(c.dataset.card))`);
   await key(String(glowIdx + 1)); await sleep(150);
   check(await js(`${B}.selected`) === glowIdx, `hotkey ${glowIdx + 1} did not select the card`);
-  check(await js(`document.querySelectorAll('.cell.target').length`) === 36, 'placement zone is not highlighted while a card is selected');
-  const cell53 = await rect('.cell[data-r="8"][data-c="4"]');
+  check(await js(`document.querySelectorAll('.cell.target').length`) === 21, 'placement zone is not highlighted while a card is selected');
+  const cell53 = await rect('.cell[data-r="7"][data-c="3"]');
   mouse('mouseMove', cell53.x, cell53.y); await sleep(200);
   const pv = await js(`({ ghost: !document.querySelector('.ent.ghost').hidden, path: !!document.querySelector('.path-layer polyline'), range: document.querySelectorAll('.cell.range').length })`);
   console.log('placement preview:', JSON.stringify(pv));
@@ -162,14 +162,14 @@ app.whenReady().then(async () => {
   mouse('mouseUp', bad.x, bad.y); await sleep(450);
   check(await js(`${B}.game.cardsPlayed[0] === 0 && !document.querySelector('.drag-card')`), 'drop on an illegal cell was not rejected cleanly');
   // drag & drop onto a legal cell
-  const good = await rect('.cell[data-r="8"][data-c="5"]');
+  const good = await rect('.cell[data-r="7"][data-c="4"]');
   await key('Escape');
   mouse('mouseDown', card.x, card.y); await sleep(40);
   for (let i = 1; i <= 6; i++) { mouse('mouseMove', card.x + (good.x - card.x) * i / 6, card.y + (good.y - card.y) * i / 6); await sleep(30); }
   check(await js(`!document.querySelector('.ent.ghost').hidden`), 'no placement ghost while dragging over a legal cell');
   mouse('mouseUp', good.x, good.y);
   check(await waitFor(`${B}.game.cardsPlayed[0] === 1 && !${B}.busy`), 'drag & drop did not play the card');
-  check(await js(`document.querySelectorAll('.pips i.on').length === 1 && !!${B}.game.entities.find(e => e.side === 0 && e.row === 8 && e.col === 5)`), 'dropped unit is not on the board / pip not filled');
+  check(await js(`document.querySelectorAll('.pips i.on').length === 1 && !!${B}.game.entities.find(e => e.side === 0 && e.row === 7 && e.col === 4)`), 'dropped unit is not on the board / pip not filled');
   // info of a hovered unit with the I key
   mouse('mouseMove', good.x, good.y); await sleep(150); await key('I'); await sleep(200);
   check(await js('!!document.querySelector(".modal .card-info")'), 'I hotkey did not open the info of the hovered unit');

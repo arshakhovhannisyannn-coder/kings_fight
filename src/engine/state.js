@@ -51,6 +51,9 @@ export function addEntity(state, side, kind, cardId, def, row, col) {
     shield: def.ability === 'ashot' ? 2 : 0,
     revive: def.ability === 'revive',
     artashes: def.ability === 'artashes' ? 3 : 0,
+    lock: 0,               // v1.4: id of the target this unit is fighting (0 = none), see combat.js
+    // v1.4 lane, fixed at placement: -1 = left half, +1 = right half, 0 = middle column (see movement.js)
+    lane: Math.sign(col - Math.ceil(state.cols / 2)),
   };
   state.entities.push(e);
   state.grid[cellIndex(state, row, col)] = e;
@@ -199,7 +202,7 @@ export function cloneState(s) {
     const c = {
       id: e.id, side: e.side, kind: e.kind, cardId: e.cardId, ctype: e.ctype, ab: e.ab,
       row: e.row, col: e.col, hp: e.hp, maxHp: e.maxHp, atk: e.atk, speed: e.speed, range: e.range,
-      isNew: e.isNew, invuln: e.invuln, dead: false, shield: e.shield, revive: e.revive, artashes: e.artashes,
+      isNew: e.isNew, invuln: e.invuln, dead: false, shield: e.shield, revive: e.revive, artashes: e.artashes, lock: e.lock || 0, lane: e.lane || 0,
     };
     n.entities[i] = c;
     n.grid[(c.row - 1) * cols + (c.col - 1)] = c;

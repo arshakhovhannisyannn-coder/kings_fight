@@ -103,13 +103,13 @@ test('placement zones: only empty cells of the own zone', () => {
 test('movement: units funnel to the bridges; water is impassable', () => {
   const s = newGame();
   assert.ok(isWater(s, 4, 2) && isWater(s, 4, 4) && !isWater(s, 4, 3));
-  const a = put(s, 0, 'spearman', 6, 2);   // column 2: tie between bridges 1 and 3 -> column 3, diagonal step
+  const a = put(s, 0, 'spearman', 6, 2);   // column 2 = left half: lane bridge in column 1, diagonal step
   const b = put(s, 0, 'spearman', 6, 5);   // already in a bridge column: straight ahead
   step(s);
-  assert.deepEqual([a.row, a.col], [5, 3]);
+  assert.deepEqual([a.row, a.col], [5, 1]);
   assert.deepEqual([b.row, b.col], [5, 5]);
   step(s); step(s);
-  assert.deepEqual([a.row, a.col], [4, 3]);
+  assert.deepEqual([a.row, a.col], [4, 1]);
   assert.deepEqual([b.row, b.col], [4, 5]);
   for (let i = 0; i < 6; i++) { step(s); assert.ok(!entityAt(s, 4, 2) && !entityAt(s, 4, 4)); }
 });

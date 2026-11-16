@@ -53,11 +53,39 @@ function distanceField(state, goalRow, goalCol) {
   return f;
 }
 
-/** Bridge columns ordered by preference for a unit in column `col` (nearest first, tie -> middle column). */
-function bridgeOrder(state, col) {
-  const mid = Math.ceil(state.cols / 2);
+/**
+ * v1.4 lanes: a unit placed in the left half of the board uses the leftmost bridge and attacks the left tower,
+ * a unit placed in the right half uses the rightmost bridge and the right tower, a unit placed in the middle column
+ * uses the middle bridge and goes for the King's castle. (v1.3 used the nearest bridge and the nearest tower with
+ * ties broken to the left, so every unit that crossed the middle bridge turned left.)
+ * Bridge columns ordered by preference: the lane's bridge first, then the others by distance.
+ */
+function laneBridge(state, lane) {
+  const b = state.cfg.board.bridgeCols, mid = Math.ceil(state.cols / 2);
+  if (lane < 0) return Math.min(...b);
+  if (lane > 0) return Math.max(...b);
+  return b.slice().sort((x, y) => Math.abs(x - mid) - Math.abs(y - mid))[0];
+}
+function bridgeOrder(state, u) {
+  const first = laneBridge(state, u.lane || 0), col = u.col;
   return state.cfg.board.bridgeCols.slice().sort((a, b) =>
-    Math.abs(a - col) - Math.abs(b - col) || Math.abs(a - mid) - Math.abs(b - mid));
+    (a === first ? -1 : 0) - (b === first ? -1 : 0) || Math.abs(a - col) - Math.abs(b - col));
+}
+
+/** The enemy tower of the unit's lane if it still stands (left / right small tower, or the castle), else null. */
+export function laneTarget(state, u) {
+  const lane = u.lane || 0;
+  let best = null;
+  for (const e of state.entities) {
+    if (e.side === u.side || e.kind !== 'tower') continue;
+    if (lane === 0) { if (e.cardId === 'tower_king') return e; continue; }
+    if (e.cardId === 'tower_king') continue;
+    if (!best || (lane < 0 ? e.col < best.col : e.col > best.col)) best = e;
+  }
+  // a small tower on the other side of the board is not "our" tower
+  const mid = Math.ceil(state.cols / 2);
+  if (best && Math.sign(best.col - mid) !== lane) return null;
+  return best;
 }
 
 /** Nearest enemy tower/building (Chebyshev; tie -> lower HP, then lower id). */
@@ -79,13 +107,13 @@ function goalFor(state, u) {
   const before = u.side === PLAYER ? u.row > riverRow : u.row < riverRow;
   if (before) {
     const ui = cellIndex(state, u.row, u.col);
-    for (const bc of bridgeOrder(state, u.col)) {
+    for (const bc of bridgeOrder(state, u)) {
       const f = distanceField(state, riverRow, bc);
       if (f[ui] !== INF) return { row: riverRow, col: bc, field: f };
     }
     return null;
   }
-  const b = nearestEnemyBuilding(state, u);
+  const b = laneTarget(state, u) || nearestEnemyBuilding(state, u);
   if (!b) return null;
   return { row: b.row, col: b.col, field: distanceField(state, b.row, b.col) };
 }

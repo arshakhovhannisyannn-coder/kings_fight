@@ -174,20 +174,21 @@ function expWeights(scale) {
   chart('5_eval_weights', 'Փորձ 5. Կշիռների հավաքածուների ընդհանուր հաղթելու տոկոսը', names, [{ name: 'հաղթելու %', color: RED, values: names.map(n => 100 * points[n] / played[n]) }]);
 }
 
-// 6. Rule variants (v1.3: why the towers became "2 / 1 at distance 1 / 2" on the 9×11 board)
+// 6. Rule variants (v1.4: 7×9 board, target lock; comparison with v1.2 and v1.3)
 function expRules(scale, mctsMs) {
   const T = (small, king) => ({ towers: { small: { atk: small[0], range: small.length, atkByDist: small }, king: { atk: king[0], range: king.length, atkByDist: king } } });
   const flat = { towers: { small: { atk: 1, range: 1, atkByDist: [] }, king: { atk: 2, range: 1, atkByDist: [] } } };
-  const V12 = { ...flat, board: { cols: 5, rows: 7, riverRow: 4, bridgeCols: [1, 3, 5] }, zones: [[5, 6], [2, 3]], newUnitCanAttack: false };
+  const V12 = { ...flat, board: { cols: 5, rows: 7, riverRow: 4, bridgeCols: [1, 3, 5] }, zones: [[5, 6], [2, 3]], newUnitCanAttack: false, targetLock: false };
+  const V13 = { ...T([2, 1], [3, 2]), board: { cols: 9, rows: 11, riverRow: 6, bridgeCols: [1, 5, 9] }, zones: [[7, 10], [2, 5]], targetLock: false };
   const cur = CONFIG.towers;
+  const tw = t => (t.atkByDist && t.atkByDist.length ? t.atkByDist.join('/') : String(t.atk)) + ` (հեռ. ${t.range})`;
   const variants = [
-    ['v1.2. դաշտ 5×7, աշտարակ՝ հեռ. 1, հարված 1 / 2, նոր զորքը խփում է 2-րդ պահից', V12],
-    ['Դաշտ 9×11, v1.2-ի աշտարակներ և նոր զորքի կանոն', { ...flat, newUnitCanAttack: false }],
-    ['9×11, աշտարակ 3/2/1, ամրոց 4/3/2 (հեռ. 3)', T([3, 2, 1], [4, 3, 2])],
-    ['9×11, աշտարակ 2/1/1, ամրոց 3/2/1 (հեռ. 3)', T([2, 1, 1], [3, 2, 1])],
-    [`Ընթացիկ կանոն (v1.3). 9×11, աշտարակ ${cur.small.atkByDist.join('/')}, ամրոց ${cur.king.atkByDist.join('/')} (հեռ. ${cur.small.range})`, {}],
-    ['v1.3, բայց նոր զորքը խփում է 2-րդ պահից', { newUnitCanAttack: false }],
-    ['v1.3 + մարտի 4 պահ', { battleTicks: 4 }],
+    ['v1.2. դաշտ 5×7, աշտարակ 1 / ամրոց 2 (հեռ. 1), նոր զորքը՝ 2-րդ պահից', V12],
+    ['v1.3. դաշտ 9×11, աշտարակ 2/1, ամրոց 3/2, առանց «կռվից չշեղվելու»', V13],
+    [`Ընթացիկ (v1.4). 7×9, աշտարակ ${tw(cur.small)}, ամրոց ${tw(cur.king)}, «կռվից չշեղվել»`, {}],
+    ['v1.4 առանց «կռվից չշեղվելու»', { targetLock: false }],
+    ['v1.4, բայց v1.2-ի աշտարակներ (1 / 2, հեռ. 1)', flat],
+    ['v1.4, նոր զորքը խփում է 2-րդ պահից', { newUnitCanAttack: false }],
   ];
   const rows = [];
   const games = 20 * scale, hardGames = 12 * scale;
@@ -199,11 +200,11 @@ function expRules(scale, mctsMs) {
     rows.push([name, games, pct(mm.draws / games), mm.avgRounds.toFixed(1), pct(mm.byReason.king / games), pct(mm.firstMoverWinRate),
       `${me.winsA}–${me.winsB}–${me.draws}`, me.avgRounds.toFixed(1), `${hm.winsA}–${hm.winsB}–${hm.draws}`, pct(hm.winRateA)]);
   }
-  write('6_rule_variants', 'Փորձ 6. Կանոնների տարբերակներ (v1.3)',
-    'v1.3-ում դաշտը 5×7-ից դարձավ 9×11, նոր դրված զորքը կարող է խփել անմիջապես, իսկ աշտարակները խփում են ավելի ուժեղ, որքան մոտ է թշնամին։ Աղյուսակը համեմատում է աշտարակների մի քանի տարբերակ. լավ կանոնը պետք է տա քիչ ոչ-ոքի, իսկ ուժեղ AI-ը (Դժվար) պետք է հստակ հաղթի թույլին (Միջին)։ Դժվարի մտածելու ժամանակը՝ ' + mctsMs + ' մվ։',
+  write('6_rule_variants', 'Փորձ 6. Կանոնների տարբերակներ (v1.2 → v1.3 → v1.4)',
+    'v1.3-ում նոր դրված զորքը սկսեց խփել անմիջապես, իսկ աշտարակները՝ ավելի ուժեղ, որքան մոտ է թշնամին (դաշտը՝ 9×11)։ Խաղալիս 9×11-ը չափազանց մեծ թվաց, ուստի v1.4-ում դաշտը 7×9 է, և ավելացավ «կռվից չշեղվելու» կանոնը (զորքը խփում է իր թիրախին, մինչև մեկնումեկը մեռնի)։ Լավ կանոնը պետք է տա քիչ ոչ-ոքի, իսկ ուժեղ AI-ը (Դժվար) պետք է հստակ հաղթի թույլին (Միջին)։ Դժվարի մտածելու ժամանակը՝ ' + mctsMs + ' մվ։',
     ['Կանոնների տարբերակ', 'Խաղեր', 'Ոչ-ոքի (Միջին—Միջին)', 'Միջին ռաունդ (Միջին—Միջին)', 'Ամրոցի ավերում (Միջին—Միջին)', 'Առաջինի հաղթելու % (Միջին—Միջին)',
       'Միջին—Հեշտ (հաղթ.–պարտ.–ոչ-ոքի)', 'Միջին ռաունդ (Միջին—Հեշտ)', 'Դժվար—Միջին (հաղթ.–պարտ.–ոչ-ոքի)', 'Դժվարի հաղթելու %'], rows,
-    'Եզրակացություն. 3 վանդակ հեռահարությամբ աշտարակները մեծ դաշտում պաշտպանությունը չափազանց ուժեղացնում են. խաղերը ձգվում են մինչև 20-րդ ռաունդ, և Դժվարի առավելությունը գրեթե անհետանում է։ «2 / 1» տարբերակը պահպանում է «որքան մոտ, այնքան ուժեղ» գաղափարը և լավագույնս տարբերակում է AI-ի մակարդակները։ Կարևոր. 9×11 դաշտում հայտնաբերվեց և ուղղվեց ճանապարհների քեշի սխալ (բիթային դիմակը 53 վանդակից ավելիի դեպքում կորցնում էր ճշգրտությունը), առանց որի բոլոր խաղերն ավարտվում էին ոչ-ոքի։ Արժեքները՝ `src/data/config.js`, `towers` դաշտ։');
+    'Եզրակացություն. տե՛ս `docs/DECISIONS.md`, բաժիններ Զ (v1.3) և Է (v1.4)։ Արժեքները՝ `src/data/config.js` (`board`, `towers`, `targetLock`)։');
   chart('6_rule_variants', 'Փորձ 6. Ոչ-ոքիներ (Միջին—Միջին) և Դժվարի հաղթանակներ', rows.map(r => r[0]), [
     { name: 'ոչ-ոքի %', color: GREY, values: rows.map(r => num(r[2])) }, { name: 'Դժվարի հաղթանակ %', color: RED, values: rows.map(r => num(r[9])) }]);
 }

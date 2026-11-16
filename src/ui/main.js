@@ -13,7 +13,7 @@ import { resultScreen } from './screens/result.js';
 import { howtoScreen } from './screens/howto.js';
 import { statsScreen } from './screens/stats.js';
 
-export const VERSION = '1.3.0';
+export const VERSION = '1.4.0';
 
 const SCREENS = {
   menu: menuScreen, splash: splashScreen, campaign: campaignScreen, intro: introScreen, free: freeBattleScreen, deck: deckScreen,

@@ -65,26 +65,27 @@ const defs = '<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" re
 const node = (x, y, label, fill = '#fbf4ee', r = 15) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#2a1a17" stroke-width="2"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#2a1a17">${label}</text>`;
 const edge = (x1, y1, x2, y2, cut = false) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${cut ? '#a3242f' : '#2a1a17'}" stroke-width="2" ${cut ? 'stroke-dasharray="4 4"' : ''}/>`;
 
-const ROUND_SVG = `<svg viewBox="0 0 560 96" xmlns="http://www.w3.org/2000/svg">${defs}
-  ${box(4, 20, 118, 52, 'Ռաունդի սկիզբ', '#f3e6dc', 'եկամուտ, նույն դիրքը')}
-  ${arrow(122, 46, 146, 46)}${box(148, 20, 118, 52, 'AI-ի պլան', '#f8dfe0', 'առանց քո քարտերը տեսնելու')}
-  ${arrow(266, 46, 290, 46)}${box(292, 20, 118, 52, 'Հակառակորդի պատասխան', '#fff1dc', 'ամենավատ դեպքը AI-ի համար')}
-  ${arrow(410, 46, 434, 46)}${box(436, 20, 120, 52, 'Մարտ → գնահատում', '#dfeadb', '3 պահ, հետո f(դիրք)')}
+// v1.4: wider boxes and shorter labels (the long ones did not fit the boxes)
+const ROUND_SVG = `<svg viewBox="0 0 640 96" xmlns="http://www.w3.org/2000/svg">${defs}
+  ${box(4, 20, 140, 56, 'Ռաունդի սկիզբ', '#f3e6dc', 'եկամուտ, նույն դիրքը')}
+  ${arrow(144, 48, 166, 48)}${box(168, 20, 140, 56, 'AI-ի պլան', '#f8dfe0', 'քո քարտերը չի տեսնում')}
+  ${arrow(308, 48, 330, 48)}${box(332, 20, 140, 56, 'Քո պատասխանը', '#fff1dc', 'վատագույնը AI-ի համար')}
+  ${arrow(472, 48, 494, 48)}${box(496, 20, 140, 56, 'Մարտ', '#dfeadb', '3 պահ → գնահատում')}
 </svg>`;
-const MINIMAX_SVG = `<svg viewBox="0 0 560 190" xmlns="http://www.w3.org/2000/svg">
+const MINIMAX_SVG = `<svg viewBox="0 0 600 196" xmlns="http://www.w3.org/2000/svg">
   ${edge(280, 30, 130, 90)}${edge(280, 30, 280, 90)}${edge(280, 30, 430, 90)}
   ${edge(130, 90, 80, 150)}${edge(130, 90, 180, 150)}${edge(280, 90, 240, 150)}${edge(280, 90, 320, 150, true)}${edge(430, 90, 390, 150)}${edge(430, 90, 470, 150, true)}
   ${node(280, 30, '+3', '#f8dfe0', 17)}${node(130, 90, '+3', '#fff1dc')}${node(280, 90, '≤1', '#fff1dc')}${node(430, 90, '≤0', '#fff1dc')}
   ${node(80, 150, '+3', '#dfeadb')}${node(180, 150, '+5', '#dfeadb')}${node(240, 150, '+1', '#dfeadb')}${node(320, 150, '?', '#eee')}${node(390, 150, '0', '#dfeadb')}${node(470, 150, '?', '#eee')}
   <text x="310" y="26" font-size="11" fill="#6b4f47">MAX — AI-ն ընտրում է առավելագույնը</text>
-  <text x="462" y="94" font-size="11" fill="#6b4f47">MIN — հակառակորդը</text>
-  <text x="300" y="184" font-size="11" fill="#a3242f">կտրված ճյուղեր (Alpha-Beta). արդեն պարզ է, որ ավելի լավը չեն</text>
+  <text x="456" y="94" font-size="11" fill="#6b4f47">MIN — հակառակորդը</text>
+  <text x="300" y="188" text-anchor="middle" font-size="11" fill="#a3242f">կետագծով՝ կտրված ճյուղեր (Alpha-Beta). դրանք արդյունքը չեն փոխի</text>
 </svg>`;
-const MCTS_SVG = `<svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg">${defs}
-  ${[['1. Ընտրություն', 'UCB1-ով իջնում ենք ծառով', '#f8dfe0'], ['2. Ընդլայնում', 'ավելացնում ենք նոր հանգույց', '#fff1dc'], ['3. Սիմուլյացիա', 'խաղում ենք 3 ռաունդ առաջ', '#dfeadb'], ['4. Հետտարածում', 'արդյունքը գրում ենք վերև', '#e9dcf2']]
-    .map(([t, s, f], i) => `${box(6 + i * 139, 14, 128, 56, t, f, s)}${i < 3 ? arrow(134 + i * 139, 42, 144 + i * 139, 42) : ''}`).join('')}
-  ${[0, 1, 2, 3].map(i => { const x = 70 + i * 139; return edge(x, 92, x - 22, 122) + edge(x, 92, x + 22, 122) + node(x, 92, '', '#fbf4ee', 9) + node(x - 22, 122, '', i === 0 ? '#a3242f' : '#fbf4ee', 8) + node(x + 22, 122, '', i >= 1 ? (i === 1 ? '#e08a2e' : i === 2 ? '#3f7a4a' : '#7b4a9e') : '#fbf4ee', 8); }).join('')}
-  <text x="280" y="146" text-anchor="middle" font-size="11" fill="#6b4f47">Կրկնվում է հազարավոր անգամ. ամենաշատ այցելված քայլն ընտրվում է</text>
+const MCTS_SVG = `<svg viewBox="0 0 640 150" xmlns="http://www.w3.org/2000/svg">${defs}
+  ${[['1. Ընտրություն', 'UCB1-ով ներքև', '#f8dfe0'], ['2. Ընդլայնում', 'նոր հանգույց', '#fff1dc'], ['3. Սիմուլյացիա', '3 ռաունդ առաջ', '#dfeadb'], ['4. Հետտարածում', 'արդյունքը՝ վերև', '#e9dcf2']]
+    .map(([t, s, f], i) => `${box(6 + i * 159, 14, 140, 56, t, f, s)}${i < 3 ? arrow(146 + i * 159, 42, 163 + i * 159, 42) : ''}`).join('')}
+  ${[0, 1, 2, 3].map(i => { const x = 76 + i * 159; return edge(x, 92, x - 22, 122) + edge(x, 92, x + 22, 122) + node(x, 92, '', '#fbf4ee', 9) + node(x - 22, 122, '', i === 0 ? '#a3242f' : '#fbf4ee', 8) + node(x + 22, 122, '', i >= 1 ? (i === 1 ? '#e08a2e' : i === 2 ? '#3f7a4a' : '#7b4a9e') : '#fbf4ee', 8); }).join('')}
+  <text x="320" y="146" text-anchor="middle" font-size="11" fill="#6b4f47">Կրկնվում է հազարավոր անգամ. ամենաշատ այցելված քայլն ընտրվում է</text>
 </svg>`;
 
 export function showExplainer() {

@@ -1,9 +1,12 @@
 // ALL tunable numbers and rule flags live here. Engine, AI and UI read from this object.
 export const CONFIG = {
-  // v1.3: board enlarged from 5×7 to 9×11 (cards unchanged). Bridges stay in front of the three towers.
-  board: { cols: 9, rows: 11, riverRow: 6, bridgeCols: [1, 5, 9] },
+  // v1.4: 7×9 board (v1.2: 5×7, v1.3: 9×11 — too big in play). Cards unchanged. Bridges stay in front of the towers.
+  board: { cols: 7, rows: 9, riverRow: 5, bridgeCols: [1, 4, 7] },
   // placement zones (rows) per side: 0 = player (bottom), 1 = AI (top) — the whole own half without the tower row
-  zones: [[7, 10], [2, 5]],
+  zones: [[6, 8], [2, 4]],
+  // v1.4: a unit that has started attacking a target (unit, tower or building) keeps attacking it while the target
+  // is alive and in range; a unit hit by an enemy unit while not fighting anyone answers that attacker.
+  targetLock: true,
   rounds: 20,                     // a round = simultaneous planning of both sides + a battle phase
   battleTicks: 3,                 // battle phase: units of BOTH sides act this many times per round
   // Engine-internal order of the (simultaneous) planning, used by the search: the first planner decides

@@ -12,11 +12,21 @@ export function anyEnemyInRange(state, u) {
 }
 
 /**
- * Target for a unit: enemy units first (lowest HP, tie -> closest, then lower id),
- * otherwise buildings/towers (closest, tie -> lowest HP, then lower id).
+ * Target for a unit: the target it is already fighting (v1.4 lock, while alive and in range); otherwise
+ * enemy units first (lowest HP, tie -> closest, then lower id), then buildings/towers (closest, tie -> lowest HP, then lower id).
  */
 export function pickTargetForUnit(state, u) {
   const ents = state.entities, r = u.range;
+  // v1.4 target lock: keep fighting the current target while it is alive and in range
+  if (u.lock && state.cfg.targetLock) {
+    for (let i = 0; i < ents.length; i++) {
+      const e = ents[i];
+      if (e.id !== u.lock) continue;
+      if (!e.dead && e.side !== u.side && chebyshev(u.row, u.col, e.row, e.col) <= r) return e;
+      break;
+    }
+    u.lock = 0;
+  }
   let bu = null, buD = 0, bb = null, bbD = 0;
   for (let i = 0; i < ents.length; i++) {
     const e = ents[i];
@@ -134,6 +144,14 @@ function killEntity(state, target, srcSide, src) {
   }
 }
 
+/** Is the unit currently fighting a target that is still alive? */
+function hasLiveLock(state, u) {
+  if (!u.lock) return false;
+  const ents = state.entities;
+  for (let i = 0; i < ents.length; i++) if (ents[i].id === u.lock) return !ents[i].dead;
+  return false;
+}
+
 /** Damage of a tower shot at Chebyshev distance d (cfg.towers.*.atkByDist; falls back to the flat atk). */
 export function towerAtkAt(state, t, d) {
   const def = state.cfg.towers[t.cardId === 'tower_king' ? 'king' : 'small'];
@@ -154,6 +172,11 @@ export function attack(state, u, target) {
     ranged = d >= 2;
   }
   ev(state, { t: 'attack', id: u.id, target: target.id, ranged });
+  if (u.kind === 'unit' && state.cfg.targetLock) {
+    u.lock = target.id;
+    // the attacked unit answers its attacker if it is not fighting anyone yet (and can reach it)
+    if (target.kind === 'unit' && !hasLiveLock(state, target) && target.atk > 0 && chebyshev(target.row, target.col, u.row, u.col) <= target.range) target.lock = u.id;
+  }
   const tr = target.row, tc = target.col;
   dealDamage(state, target, a, u.side, u, ranged);
   if (u.ab === 'splash') {
